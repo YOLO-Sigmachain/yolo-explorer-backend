@@ -5,8 +5,10 @@ import cats.instances.try_._
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.refineMV
 import eu.timepit.refined.string.ValidByte
-import org.ergoplatform.explorer.settings.{DbSettings, ProtocolSettings}
+import org.ergoplatform.explorer.settings.{DbSettings, ProtocolSettings, YoloSettings}
 import org.ergoplatform.settings.MonetarySettings
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 
 import scala.util.Try
 
@@ -22,7 +24,16 @@ trait MainNetConfiguration {
   val MainNetPrefix: Refined[String, ValidByte] = refineMV[ValidByte]("16")
 
   val monetarySettings = MonetarySettings()
-  val protocolSettings = ProtocolSettings(MainNetPrefix, GenesisAddress, monetarySettings)
+  val protocolSettings = ProtocolSettings(
+    MainNetPrefix,
+    GenesisAddress,
+    testConstants.DevnetEmissionNftId,
+    testConstants.DevnetTreasuryAccumulationAddress,
+    testConstants.DevnetLpAccumulationAddress,
+    monetarySettings,
+    ConfigSource.default.at("protocol.voting-epoch-length").loadOrThrow[Int],
+    ConfigSource.default.at("protocol.yolo").loadOrThrow[YoloSettings]
+  )
 
   val mainnetNodes =
     NonEmptyList.one(UrlString.fromString[Try]("http://139.59.29.87:9053").get)

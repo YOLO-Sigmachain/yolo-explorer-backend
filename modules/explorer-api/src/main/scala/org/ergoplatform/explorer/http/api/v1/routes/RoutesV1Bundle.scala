@@ -31,7 +31,8 @@ object RoutesV1Bundle {
     serviceSettings: ServiceSettings,
     requestsSettings: RequestsSettings,
     utxCacheSettings: UtxCacheSettings,
-    redis: Option[RedisCommands[F, String, String]]
+    redis: Option[RedisCommands[F, String, String]],
+    votingEpochLength: Int
   )(trans: D Trans F)(implicit
     ec: ExecutionContext,
     encoder: ErgoAddressEncoder,
@@ -47,7 +48,7 @@ object RoutesV1Bundle {
       tokens                    <- Tokens(trans)
       assets                    <- Assets(trans)
       epochs                    <- Epochs(trans)
-      blocks                    <- Blocks(serviceSettings)(trans)
+      blocks                    <- Blocks(serviceSettings, votingEpochLength)(trans)
       transactions              <- Transactions(serviceSettings)(trans)
       infoRoutes      = StatsRoutes(infos)
       boxesRoutes     = BoxesRoutes(requestsSettings, boxes)

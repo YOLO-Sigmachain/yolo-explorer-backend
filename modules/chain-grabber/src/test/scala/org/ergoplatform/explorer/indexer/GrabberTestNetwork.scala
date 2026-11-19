@@ -5,7 +5,7 @@ import cats.syntax.applicative._
 import org.ergoplatform.explorer.services.ErgoNetwork
 import org.ergoplatform.{ErgoLikeTransaction, explorer}
 import org.ergoplatform.explorer.indexer.GrabberTestNetwork.Source
-import org.ergoplatform.explorer.protocol.models.{ApiFullBlock, ApiNodeInfo, ApiTransaction}
+import org.ergoplatform.explorer.protocol.models.{ApiFullBlock, ApiGenesisBox, ApiNodeInfo, ApiTransaction}
 
 final class GrabberTestNetwork[F[_]: Applicative](val source: Source)
   extends ErgoNetwork[F] {
@@ -18,6 +18,8 @@ final class GrabberTestNetwork[F[_]: Applicative](val source: Source)
 
   def getFullBlockById(id: explorer.BlockId): F[Option[ApiFullBlock]] =
     source.blocksStorage.values.flatten.find(_.header.id == id).pure[F]
+
+  def getGenesisBoxes: F[List[ApiGenesisBox]] = List.empty[ApiGenesisBox].pure[F]
 
   def getUnconfirmedTransactions: F[List[ApiTransaction]] = ???
 

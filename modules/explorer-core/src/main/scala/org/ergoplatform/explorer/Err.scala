@@ -30,6 +30,9 @@ object Err {
 
     final case class TransactionDecodingFailed(json: String)
       extends ProcessingErr(s"Failed to decode transaction from json: $json")
+
+    final case class GenesisMismatch(details: String)
+      extends ProcessingErr(s"Genesis state does not match the protocol config, refusing to index: $details")
   }
 
   abstract class RequestProcessingErr(val msg: String) extends Err

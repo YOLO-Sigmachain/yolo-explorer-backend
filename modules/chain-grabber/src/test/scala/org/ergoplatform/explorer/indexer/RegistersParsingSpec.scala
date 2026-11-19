@@ -3,7 +3,7 @@ package org.ergoplatform.explorer.indexer
 import cats.data.NonEmptyList
 import cats.effect.IO
 import eu.timepit.refined.refineMV
-import org.ergoplatform.explorer.{Address, BlockId, HexString, TxId}
+import org.ergoplatform.explorer.{testConstants, Address, BlockId, HexString, TxId}
 import org.ergoplatform.explorer.indexer.models.SlotData
 import org.ergoplatform.explorer.protocol.models.{
   ApiBlockTransactions,
@@ -12,8 +12,10 @@ import org.ergoplatform.explorer.protocol.models.{
   ApiOutput,
   ApiTransaction
 }
-import org.ergoplatform.explorer.settings.ProtocolSettings
+import org.ergoplatform.explorer.settings.{ProtocolSettings, YoloSettings}
 import org.ergoplatform.settings.MonetarySettings
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
 import tofu.{Context, WithContext}
 
 import org.scalatest._
@@ -86,7 +88,12 @@ object RegistersParsingSpec {
       Address.fromStringUnsafe(
         "2Z4YBkDsDvQj8BX7xiySFewjitqp2ge9c99jfes2whbtKitZTxdBYqbrVZUvZvKv6aqn9by4kp3LE1c26LCyosFnVnm6b6U1JYvWpYmL2ZnixJbXLjWAWuBThV1D6dLpqZJYQHYDznJCk49g5TUiS4q8khpag2aNmHwREV7JSsypHdHLgJT7MGaw51aJfNubyzSKxZ4AJXFS27EfXwyCLzW1K6GVqwkJtCoPvrcLqmqwacAWJPkmh78nke9H4oT88XmSbRt2n9aWZjosiZCafZ4osUDxmZcc5QVEeTWn8drSraY3eFKe8Mu9MSCcVU"
       ),
-      MonetarySettings()
+      testConstants.DevnetEmissionNftId,
+      testConstants.DevnetTreasuryAccumulationAddress,
+      testConstants.DevnetLpAccumulationAddress,
+      MonetarySettings(),
+      ConfigSource.default.at("protocol.voting-epoch-length").loadOrThrow[Int],
+      ConfigSource.default.at("protocol.yolo").loadOrThrow[YoloSettings]
     )
   )
 

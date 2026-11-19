@@ -8,7 +8,7 @@ import io.chrisdavenport.log4cats.Logger
 import io.chrisdavenport.log4cats.slf4j.Slf4jLogger
 import org.ergoplatform.ErgoLikeTransaction
 import org.ergoplatform.explorer.Err.RequestProcessingErr.NetworkErr.InvalidTransaction
-import org.ergoplatform.explorer.protocol.models.{ApiFullBlock, ApiNodeInfo, ApiTransaction}
+import org.ergoplatform.explorer.protocol.models.{ApiFullBlock, ApiGenesisBox, ApiNodeInfo, ApiTransaction}
 import org.ergoplatform.explorer.protocol.ergoInstances._
 import org.ergoplatform.explorer.settings.NetworkSettings
 import org.ergoplatform.explorer.{BlockId, UrlString}
@@ -41,6 +41,10 @@ trait ErgoNetwork[F[_]] {
   /** Get full block by its `id`.
     */
   def getFullBlockById(id: BlockId): F[Option[ApiFullBlock]]
+
+  /** Get the boxes of the genesis state (they are created by no block).
+    */
+  def getGenesisBoxes: F[List[ApiGenesisBox]]
 
   /** Get unconfirmed transactions from UTX pool.
     */
@@ -97,6 +101,11 @@ object ErgoNetwork {
         client.expectOption[ApiFullBlock](
           makeGetRequest(s"$url/blocks/$id")
         )
+      }
+
+    def getGenesisBoxes: F[List[ApiGenesisBox]] =
+      run { url =>
+        client.expect[List[ApiGenesisBox]](makeGetRequest(s"$url/utxo/genesis"))
       }
 
     def getUnconfirmedTransactions: F[List[ApiTransaction]] =

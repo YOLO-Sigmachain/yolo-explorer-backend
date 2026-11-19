@@ -36,10 +36,11 @@ object FullBlockInfo {
     assets: List[ExtendedAsset],
     extension: BlockExtension,
     adProof: Option[AdProof],
-    blockSize: Int
+    blockSize: Int,
+    votingEpochLength: Int
   ): FullBlockInfo = {
     val txsInfo            = TransactionInfo.batch(txs.map(_ -> numConfirmations), inputs, dataInputs, outputs, assets)
-    val headerInfo         = HeaderInfo(h, blockSize)
+    val headerInfo         = HeaderInfo(h, blockSize, votingEpochLength)
     val adProofInfo        = adProof.map(_.proofBytes)
     val blockExtensionInfo = BlockExtensionInfo(extension)
     new FullBlockInfo(headerInfo, txsInfo, blockExtensionInfo, adProofInfo)

@@ -10,6 +10,12 @@ import tofu.syntax.monadic._
 
 object blockStats {
 
+  /** `a + b` for non-negative running totals, pinned at Long.MaxValue instead of wrapping negative. */
+  @inline def saturatingAdd(a: Long, b: Long): Long = {
+    val sum = a + b
+    if (((a ^ sum) & (b ^ sum)) < 0) Long.MaxValue else sum
+  }
+
   @inline def recalculateStats[F[_]: Functor: WithContext[*[_], ProtocolSettings]](
     currentBlockStats: BlockStats,
     prevBlockStats: BlockStats
@@ -22,7 +28,7 @@ object blockStats {
       val totalMiningTime   = prevBlockStats.totalMiningTime + blockMiningTime
       val totalFees         = prevBlockStats.totalFees + currentBlockStats.blockFee
       val minerReward       = prevBlockStats.totalMinersReward + currentBlockStats.minerReward
-      val totalCoins        = prevBlockStats.totalCoinsInTxs + currentBlockStats.blockCoins
+      val totalCoins        = saturatingAdd(prevBlockStats.totalCoinsInTxs, currentBlockStats.blockCoins)
       TotalStats(
         talBlockchainSize,
         totalTxsCount,

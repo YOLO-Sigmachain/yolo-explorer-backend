@@ -12,13 +12,12 @@ object constants {
 
   val GenesisHeight: Int = PreGenesisHeight + 1
 
+  /** Lowest global index of a box: the genesis boxes (four on YOLO, node `/utxo/genesis`) take -4 to -1. */
+  val MinBoxGlobalIndex: Long = -4L
+
   val PublicKeyLength = 33
 
-  val EpochLength = 1024
-
   val MinerRewardDelta = 720
-
-  val TeamTreasuryThreshold = 67500000000L
 
   val group: BcDlogGroup = CryptoConstants.dlogGroup
 
@@ -30,12 +29,4 @@ object constants {
   val CoinsInOneErgo: Long = 1000000000L
 
   val ErgoDecimalPlacesNum: Int = 9
-
-  val Eip27UpperPoint        = 15 * CoinsInOneErgo
-  val Eip27DefaultReEmission = 12 * CoinsInOneErgo
-  val Eip27LowerPoint        = 3 * CoinsInOneErgo
-  val Eip27ResidualEmission  = 3 * CoinsInOneErgo
-
-  val MainnetEip27ActivationHeight = 777217
-  val TestnetEip27ActivationHeight = 188001
 }

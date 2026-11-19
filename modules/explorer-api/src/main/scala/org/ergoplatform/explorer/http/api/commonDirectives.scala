@@ -6,6 +6,7 @@ import cats.syntax.flatMap._
 import cats.syntax.option._
 import org.ergoplatform.explorer.http.api.models.Sorting.SortOrder
 import org.ergoplatform.explorer.http.api.models.{HeightRange, InclusionHeightRange, Paging, Sorting}
+import org.ergoplatform.explorer.protocol.constants
 import sttp.tapir.{query, EndpointInput, ValidationError, Validator}
 
 import java.util.concurrent.TimeUnit
@@ -86,6 +87,11 @@ object commonDirectives {
     query[Long]("minGix")
       .validate(Validator.min(0L))
       .description("Min global index (in blockchain) of an on-chain entity")
+
+  def minBoxGlobalIndex: EndpointInput.Query[Long] =
+    query[Long]("minGix")
+      .validate(Validator.min(constants.MinBoxGlobalIndex))
+      .description("Min global index (in blockchain) of a box; genesis boxes have negative indexes")
 
   def concise: EndpointInput.Query[Boolean] =
     query[Boolean]("concise")

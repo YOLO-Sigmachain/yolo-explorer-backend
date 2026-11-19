@@ -44,14 +44,14 @@ object BlockInfo {
 
   implicit val validator: Validator[BlockInfo] = schema.validator
 
-  def apply(block: ExtendedBlockInfo): BlockInfo = {
+  def apply(block: ExtendedBlockInfo, votingEpochLength: Int): BlockInfo = {
     val minerName = block.minerNameOpt.getOrElse(
       block.blockInfo.minerAddress.unwrapped.takeRight(8)
     )
     new BlockInfo(
       id                = block.blockInfo.headerId,
       height            = block.blockInfo.height,
-      epoch             = blocks.epochOf(block.blockInfo.height),
+      epoch             = blocks.epochOf(block.blockInfo.height, votingEpochLength),
       version           = block.blockVersion,
       timestamp         = block.blockInfo.timestamp,
       transactionsCount = block.blockInfo.txsCount,

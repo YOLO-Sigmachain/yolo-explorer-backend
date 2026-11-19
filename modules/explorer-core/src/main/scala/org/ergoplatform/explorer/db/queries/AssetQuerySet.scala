@@ -93,8 +93,7 @@ object AssetQuerySet extends QuerySet {
          |    inner join (
          |      select distinct o.box_id from node_outputs o
          |      left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |      left join node_transactions tx on tx.id = o.tx_id and tx.main_chain = true
-         |      where tx.inclusion_height <= $maxHeight
+         |      where o.settlement_height <= $maxHeight
          |        and o.main_chain = true
          |        and i.box_id is null
          |        and o.ergo_tree = $ergoTree

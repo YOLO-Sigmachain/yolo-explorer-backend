@@ -55,14 +55,14 @@ object HeaderInfo {
 
   implicit val validator: Validator[HeaderInfo] = schema.validator
 
-  def apply(h: Header, size: Int): HeaderInfo = {
+  def apply(h: Header, size: Int, votingEpochLength: Int): HeaderInfo = {
     val powSolutions = PowSolutionInfo(h.minerPk, h.w, h.n, h.d)
     new HeaderInfo(
       h.id,
       h.parentId,
       h.version.toShort,
       h.height,
-      blocks.epochOf(h.height),
+      blocks.epochOf(h.height, votingEpochLength),
       h.difficulty,
       h.adProofsRoot,
       h.stateRoot,

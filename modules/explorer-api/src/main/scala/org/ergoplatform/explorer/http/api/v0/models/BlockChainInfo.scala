@@ -21,7 +21,9 @@ object BlockChainInfo {
     Schema
       .derived[BlockChainInfo]
       .modify(_.version)(_.description("Network protocol version"))
-      .modify(_.supply)(_.description("Total supply in nanoErgs"))
+      .modify(_.supply)(
+        _.description("Coins released from the emission box in nanocoins, excluding the 201 YOLO in genesis boxes")
+      )
       .modify(_.transactionAverage)(_.description("Average number of transactions per block"))
       .modify(_.hashRate)(_.description("Network hash rate"))
 

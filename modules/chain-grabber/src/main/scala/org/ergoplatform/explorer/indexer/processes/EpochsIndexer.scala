@@ -10,7 +10,6 @@ import org.ergoplatform.explorer.db.Trans
 import org.ergoplatform.explorer.db.algebra.LiftConnectionIO
 import org.ergoplatform.explorer.db.models.EpochParameters
 import org.ergoplatform.explorer.indexer.modules.RepoBundle
-import org.ergoplatform.explorer.protocol.constants
 import org.ergoplatform.explorer.settings.IndexerSettings
 import tofu.MonadThrow
 import tofu.logging.{Logging, Logs}
@@ -56,14 +55,14 @@ object EpochsIndexer {
       for {
         lastHeight  <- repos.epochInfoRepo.getLastHeight ||> trans.xa
         currentInfo <- network.getNodeInfo
-        epochInfo   <- repos.epochInfoRepo.getByEpochId(lastHeight / constants.EpochLength) ||> trans.xa
+        epochInfo   <- repos.epochInfoRepo.getByEpochId(lastHeight / settings.protocol.votingEpochLength) ||> trans.xa
         _ <- epochInfo match {
                case Some(_) => trace"Epoch info at height ${currentInfo.fullHeight} already persist"
                case None =>
                  repos.epochInfoRepo.insert(
                    currentInfo.parameters
                      .into[EpochParameters]
-                     .withFieldComputed(_.id, _.height / constants.EpochLength)
+                     .withFieldComputed(_.id, _.height / settings.protocol.votingEpochLength)
                      .transform
                  ) ||> trans.xa
              }

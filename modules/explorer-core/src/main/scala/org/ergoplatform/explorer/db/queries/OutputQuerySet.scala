@@ -131,9 +131,8 @@ object OutputQuerySet extends QuerySet {
          |  i.tx_id
          |from node_outputs o
          |left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |left join node_transactions tx on tx.id = o.tx_id
          |where o.main_chain = true
-         |  and tx.inclusion_height <= $maxHeight
+         |  and o.settlement_height <= $maxHeight
          |  and o.ergo_tree = $ergoTree
          |offset $offset limit $limit
          |""".stripMargin.query[ExtendedOutput]
@@ -145,9 +144,7 @@ object OutputQuerySet extends QuerySet {
     sql"""
          |select coalesce(cast(sum(o.value) as bigint), 0)
          |from node_outputs o
-         |left join node_transactions tx on tx.id = o.tx_id
-         |where tx.main_chain = true
-         |  and tx.inclusion_height <= $maxHeight
+         |where o.settlement_height <= $maxHeight
          |  and o.main_chain = true
          |  and o.ergo_tree = $ergoTree
          |""".stripMargin.query[Long]
@@ -159,9 +156,7 @@ object OutputQuerySet extends QuerySet {
     sql"""
          |select coalesce(cast(sum(o.value) as bigint), 0) from node_outputs o
          |left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |left join node_transactions tx on tx.id = o.tx_id
-         |where tx.main_chain = true
-         |  and tx.inclusion_height <= $maxHeight
+         |where o.settlement_height <= $maxHeight
          |  and o.main_chain = true
          |  and i.box_id is null
          |  and o.ergo_tree = $ergoTree
@@ -177,9 +172,7 @@ object OutputQuerySet extends QuerySet {
          |    select o.ergo_tree as ergo_tree, coalesce(cast(sum(o.value) as bigint), 0) as csum
          |      from node_outputs o
          |        left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |        left join node_transactions tx on tx.id = o.tx_id
-         |      where tx.main_chain = true
-         |        and tx.inclusion_height <= $maxHeight
+         |      where o.settlement_height <= $maxHeight
          |        and o.main_chain = true
          |        and i.box_id is null
          |      group by o.ergo_tree, o.address
@@ -204,7 +197,6 @@ object OutputQuerySet extends QuerySet {
     sql"""
          |select o.address, coalesce(cast(sum(o.value) as bigint), 0) as balance from node_outputs o
          |left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |left join node_transactions tx on tx.id = o.tx_id
          |where o.main_chain = true and i.box_id is null
          |group by o.address
          |order by balance desc
@@ -216,7 +208,6 @@ object OutputQuerySet extends QuerySet {
          |select count(*) from (
          |  select distinct o.address from node_outputs o
          |  left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |  left join node_transactions tx on tx.id = o.tx_id
          |  where o.main_chain = true and i.box_id is null
          |) as _
          |""".stripMargin.query[Int]
@@ -435,11 +426,10 @@ object OutputQuerySet extends QuerySet {
          |  o.main_chain
          |from node_outputs o
          |left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |left join node_headers h on h.id = o.header_id
          |where o.main_chain = true
          |  and i.box_id is null
-         |  and h.height >= $minHeight
-         |  and h.height <= $maxHeight
+         |  and o.settlement_height >= $minHeight
+         |  and o.settlement_height <= $maxHeight
          |order by o.global_index asc
          |""".stripMargin.query[Output]
 
@@ -885,11 +875,10 @@ object OutputQuerySet extends QuerySet {
          |  i.tx_id
          |from node_outputs o
          |left join node_inputs i on o.box_id = i.box_id and i.main_chain = true
-         |left join node_headers h on h.id = o.header_id
          |where o.ergo_tree_template_hash = $templateHash
-         |  and h.height >= $minHeight
-         |  and h.height <= $maxHeight
-         |order by h.height asc
+         |  and o.settlement_height >= $minHeight
+         |  and o.settlement_height <= $maxHeight
+         |order by o.settlement_height asc
          |""".stripMargin.query[ExtendedOutput]
 
   def getUnspentByErgoTreeTemplateHashByEpochs(templateHash: ErgoTreeTemplateHash, minHeight: Int, maxHeight: Int)(

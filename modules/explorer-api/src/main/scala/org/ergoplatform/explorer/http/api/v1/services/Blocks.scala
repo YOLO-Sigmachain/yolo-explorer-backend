@@ -54,7 +54,7 @@ object Blocks {
   def apply[
     F[_]: Sync,
     D[_]: Monad: LiftConnectionIO: CRaise[*[_], InconsistentDbData]: CompileStream
-  ](serviceSettings: ServiceSettings)(trans: D Trans F): F[Blocks[F]] =
+  ](serviceSettings: ServiceSettings, votingEpochLength: Int)(trans: D Trans F): F[Blocks[F]] =
     (
       HeaderRepo[F, D],
       BlockInfoRepo[F, D],
@@ -66,7 +66,7 @@ object Blocks {
       OutputRepo[F, D],
       AssetRepo[F, D]
     ).mapN {
-      new Live[F, D](serviceSettings, _, _, _, _, _, _, _, _, _)(trans)
+      new Live[F, D](serviceSettings, votingEpochLength, _, _, _, _, _, _, _, _, _)(trans)
     }
 
   final private class Live[
@@ -74,6 +74,7 @@ object Blocks {
     D[_]: CRaise[*[_], InconsistentDbData]: Monad: CompileStream
   ](
     serviceSettings: ServiceSettings,
+    votingEpochLength: Int,
     headerRepo: HeaderRepo[D, Stream],
     blockInfoRepo: BlockInfoRepo[D],
     transactionRepo: TransactionRepo[D, Stream],
@@ -92,7 +93,7 @@ object Blocks {
       headerRepo.getBestHeight.flatMap { total =>
         blockInfoRepo
           .getMany(paging.offset, paging.limit, sorting.order.value, sorting.sortBy)
-          .map(_.map(BlockInfo(_)))
+          .map(_.map(BlockInfo(_, votingEpochLength)))
           .map(Items(_, total))
       } ||> trans.xa
 
@@ -113,7 +114,7 @@ object Blocks {
     }
 
     def streamBlocks(minGix: Long, limit: Int): Stream[F, BlockInfo] =
-      blockInfoRepo.stream(minGix, limit).map(BlockInfo(_)).thrushK(trans.xas)
+      blockInfoRepo.stream(minGix, limit).map(BlockInfo(_, votingEpochLength)).thrushK(trans.xas)
 
     def getBlockHeaders(paging: Paging, sorting: Sorting): F[Items[BlockHeader]] =
       headerRepo.getBestHeight.flatMap { total =>
@@ -157,7 +158,8 @@ object Blocks {
                          dataInputs.filter(inp => trans.exists(_.id == inp.input.txId)),
                          outputs.filter(out => trans.exists(_.id == out.output.txId)),
                          groupedAssets.getOrElse(header.id, List.empty),
-                         sizes.getOrElse(header.id, 0)
+                         sizes.getOrElse(header.id, 0),
+                         votingEpochLength
                        )
                      }
         summary <- Stream.emits(blockInfos.toList)
@@ -190,7 +192,8 @@ object Blocks {
             assets,
             ext,
             adProofsOpt,
-            size
+            size,
+            votingEpochLength
           )
         }
   }

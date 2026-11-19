@@ -83,6 +83,7 @@ object ChainIndexer {
 
     def sync: Stream[F, Unit] =
       for {
+        _             <- Stream.eval(indexGenesisBoxes)
         networkHeight <- Stream.eval(network.getBestHeight)
         localHeight   <- Stream.eval(getLastGrabbedBlockHeight)
         _             <- Stream.eval(info"Current network height : $networkHeight")
@@ -113,6 +114,26 @@ object ChainIndexer {
         } yield blocks.size
       pullBlocks.guarantee(commitChainUpdates)
     }
+
+    /** Writes the genesis state boxes once (they are created by no block), so that the transactions spending them
+      * have all their inputs and the tokens they hold are listed. Every sync first checks the node's genesis against
+      * the protocol config and fails (indexes nothing) on a mismatch.
+      */
+    private def indexGenesisBoxes: F[Unit] =
+      network.getGenesisBoxes.flatTap(genesis.checkEmissionBox[F]).flatMap { boxes =>
+        (repos.outputs.getAllByTxId(genesis.GenesisTxId) ||> trans.xa).flatMap {
+          case Nil =>
+            for {
+              rows <- genesis.rows[F](boxes)
+              _ <- (repos.outputs.insertMany(rows.outputs) >>
+                     repos.assets.insertMany(rows.assets) >>
+                     (if (settings.indexes.boxRegisters) repos.registers.insertMany(rows.registers) else unit[D]) >>
+                     repos.tokens.insertMany(rows.tokens)) ||> trans.xa
+              _ <- info"${rows.outputs.size} genesis box(es) indexed"
+            } yield ()
+          case _ => unit[F]
+        }
+      }
 
     private def applyBestBlock(block: ApiFullBlock): F[Unit] = {
       val id           = block.header.id

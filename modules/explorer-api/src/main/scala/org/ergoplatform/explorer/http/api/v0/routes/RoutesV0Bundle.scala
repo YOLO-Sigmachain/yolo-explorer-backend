@@ -38,7 +38,7 @@ object RoutesV0Bundle {
   ): F[RoutesV0Bundle[F]] =
     for {
       implicit0(log: Logger[F]) <- Slf4jLogger.create
-      blockChainService         <- BlockChainService(trans)
+      blockChainService         <- BlockChainService(protocolSettings.votingEpochLength)(trans)
       assetsService             <- AssetsService(trans)
       addressesService          <- AddressesService(trans)
       statsService              <- StatsService(protocolSettings)(trans)

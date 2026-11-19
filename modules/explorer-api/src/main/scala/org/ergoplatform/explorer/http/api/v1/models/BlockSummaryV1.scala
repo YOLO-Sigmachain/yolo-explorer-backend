@@ -31,10 +31,11 @@ object BlockSummaryV1 {
     dataInputs: List[ExtendedDataInput],
     outputs: List[ExtendedOutput],
     assets: List[ExtendedAsset],
-    blockSize: Int
+    blockSize: Int,
+    votingEpochLength: Int
   ): BlockSummaryV1 = {
     val txsInfo    = TxInf.batch(txs.map(_ -> numConfirmations), inputs, dataInputs, outputs, assets)
-    val headerInfo = HeaderInfo(h, blockSize)
+    val headerInfo = HeaderInfo(h, blockSize, votingEpochLength)
     new BlockSummaryV1(headerInfo, txsInfo)
   }
 }

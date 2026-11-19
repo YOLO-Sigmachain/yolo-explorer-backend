@@ -55,7 +55,7 @@ object BlockChainService {
   def apply[
     F[_]: Sync,
     D[_]: LiftConnectionIO: CRaise[*[_], InconsistentDbData]: Monad
-  ](xa: D Trans F): F[BlockChainService[F]] =
+  ](votingEpochLength: Int)(xa: D Trans F): F[BlockChainService[F]] =
     Slf4jLogger
       .create[F]
       .flatMap { implicit logger =>
@@ -69,13 +69,14 @@ object BlockChainService {
           DataInputRepo[F, D],
           OutputRepo[F, D],
           AssetRepo[F, D]
-        ).mapN(new Live(_, _, _, _, _, _, _, _, _)(xa))
+        ).mapN(new Live(votingEpochLength, _, _, _, _, _, _, _, _, _)(xa))
       }
 
   final private class Live[
     F[_]: Sync: Logger,
     D[_]: CRaise[*[_], InconsistentDbData]: Monad
   ](
+    votingEpochLength: Int,
     headerRepo: HeaderRepo[D, Stream],
     blockInfoRepo: BlockInfoRepo[D],
     transactionRepo: TransactionRepo[D, Stream],
@@ -153,7 +154,8 @@ object BlockChainService {
             assets,
             ext,
             adProofsOpt,
-            size
+            size,
+            votingEpochLength
           )
         }
   }

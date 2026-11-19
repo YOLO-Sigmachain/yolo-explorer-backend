@@ -4,11 +4,11 @@ import cats.Monad
 import org.ergoplatform.explorer.Err.{ProcessingErr, RefinementFailed}
 import org.ergoplatform.explorer.db.models.BlockStats
 import org.ergoplatform.explorer.indexer.models.SlotData
-import org.ergoplatform.explorer.protocol.constants
-import org.ergoplatform.explorer.protocol.models.ApiFullBlock
+import org.ergoplatform.explorer.protocol.{constants, sigmaWrappers}
+import org.ergoplatform.explorer.protocol.models.{ApiFullBlock, ApiTransaction}
 import org.ergoplatform.explorer.settings.ProtocolSettings
 import org.ergoplatform.explorer.{Address, BuildFrom, CRaise}
-import org.ergoplatform.{ErgoTreePredef, Pay2SAddress}
+import org.ergoplatform.{ErgoAddressEncoder, ErgoTreePredef, Pay2SAddress}
 import scorex.util.encode.Base16
 import sigma.crypto.EcPointType
 import sigma.data.ProveDlog
@@ -29,11 +29,7 @@ final class BlockInfoBuildFrom[
       val SlotData(apiBlock, prevBlockInfo) = slot
       minerRewardAddress(apiBlock)(protocolSettings).map { minerAddress =>
         val (reward, fee) = minerRewardAndFee(apiBlock)(protocolSettings)
-        val coinBaseValue = reward + fee
-        val blockCoins = apiBlock.transactions.transactions
-          .flatMap(_.outputs.toList)
-          .map(_.value)
-          .sum - coinBaseValue
+        val blockCoins    = coinsInTxs(apiBlock)(protocolSettings) - fee
         val miningTime = apiBlock.header.timestamp - prevBlockInfo
           .map(_.timestamp)
           .getOrElse(0L)
@@ -71,7 +67,7 @@ final class BlockInfoBuildFrom[
           totalMinersReward = prevBlockInfo
             .map(_.totalMinersReward)
             .getOrElse(0L) + reward,
-          totalCoinsInTxs = prevBlockInfo.map(_.totalCoinsInTxs).getOrElse(0L) + blockCoins,
+          totalCoinsInTxs = blockStats.saturatingAdd(prevBlockInfo.map(_.totalCoinsInTxs).getOrElse(0L), blockCoins),
           maxTxGix        = maxGlobalTxIndex,
           maxBoxGix       = maxGlobalBoxIndex,
           mainChain       = false
@@ -106,13 +102,43 @@ final class BlockInfoBuildFrom[
   private def minerRewardAndFee(
     apiBlock: ApiFullBlock
   )(protocolSettings: ProtocolSettings): (Long, Long) = {
-    val emission = protocolSettings.emission.emissionAt(apiBlock.header.height.toLong)
-    val reward   = math.min(constants.TeamTreasuryThreshold, emission)
+    val reward = protocolSettings.emission.minerRewardAt(apiBlock.header.height.toLong)
     val fee = apiBlock.transactions.transactions
       .flatMap(_.outputs.toList)
       .filter(_.ergoTree.unwrapped == constants.FeePropositionScriptHex)
       .map(_.value)
       .sum
     (reward, fee)
+  }
+
+  /** Sum of the outputs of every transaction in the block except the emission spend, capped at Long.MaxValue.
+    * The emission spend is the transaction with an output holding the emission NFT (`emissionNftId`). At the terminal
+    * height the emission box is spent without a successor and the NFT is burned; there it is the transaction whose
+    * first two outputs pay the treasury and LP shares of that height to the two accumulation scripts. A block with
+    * no emission spend counts the outputs of all its transactions.
+    */
+  private def coinsInTxs(apiBlock: ApiFullBlock)(protocolSettings: ProtocolSettings): Long = {
+    implicit val e: ErgoAddressEncoder = protocolSettings.addressEncoder
+    val txs                            = apiBlock.transactions.transactions
+    val height                         = apiBlock.header.height.toLong
+    def terminalSpend: Option[ApiTransaction] = {
+      val split        = protocolSettings.emission.splitAt(height)
+      val treasuryTree = sigmaWrappers.addressToErgoTreeHex(protocolSettings.treasuryAccumulationAddress)
+      val lpTree       = sigmaWrappers.addressToErgoTreeHex(protocolSettings.lpAccumulationAddress)
+      txs.find { tx =>
+        tx.outputs.toList match {
+          case treasury :: lp :: _ =>
+            treasury.ergoTree == treasuryTree && treasury.value == split.treasury &&
+              lp.ergoTree == lpTree && lp.value == split.lp
+          case _ => false
+        }
+      }
+    }
+    val emissionTxId = txs
+      .find(_.outputs.exists(_.assets.exists(_.tokenId == protocolSettings.emissionNftId)))
+      .orElse(if (height == protocolSettings.emission.terminalHeight) terminalSpend else None)
+      .map(_.id)
+    val total = txs.filterNot(tx => emissionTxId.contains(tx.id)).flatMap(_.outputs.toList).map(o => BigInt(o.value)).sum
+    total.min(BigInt(Long.MaxValue)).toLong
   }
 }

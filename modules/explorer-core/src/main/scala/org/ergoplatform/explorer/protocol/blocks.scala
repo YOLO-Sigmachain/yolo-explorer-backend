@@ -4,7 +4,7 @@ import scorex.util.encode.Base16
 
 object blocks {
 
-  @inline def epochOf(height: Int): Int = height / constants.EpochLength
+  @inline def epochOf(height: Int, votingEpochLength: Int): Int = height / votingEpochLength
 
   @inline def expandVotes(votesHex: String): (Byte, Byte, Byte) = {
     val defaultVotes = (0: Byte, 0: Byte, 0: Byte)

@@ -156,6 +156,11 @@ package object explorer {
     implicit def validator: Validator[TokenId] =
       implicitly[Validator[HexString]].contramap[TokenId](_.value)
 
+    implicit def configReader: ConfigReader[TokenId] =
+      implicitly[ConfigReader[String]].emap { s =>
+        fromString[Either[RefinementFailed, *]](s).leftMap(e => CannotConvert(s, s"Refined", e.msg))
+      }
+
     def fromString[
       F[_]: CRaise[*[_], RefinementFailed]: Applicative
     ](s: String): F[TokenId] =
