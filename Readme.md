@@ -1,6 +1,4 @@
-# Ergo Blockchain Explorer
-
-## About this fork
+# YOLO explorer backend
 
 This is the YOLO SigmaChain fork of [explorer-backend](https://github.com/ergoplatform/explorer-backend).
 
@@ -11,7 +9,15 @@ This is the YOLO SigmaChain fork of [explorer-backend](https://github.com/ergopl
   - Reference settings files and tests for these rules.
 - **Fixed to the test genesis:** the lowest box index (four genesis boxes) and the API text "201 YOLO in genesis boxes" follow the test genesis. Both change if the launch genesis differs.
 - **Compare with upstream:** Every change is in the commits after the starting commit above. GitHub's compare view against the upstream project shows them.
-- **Licence:** the upstream project does not state one. Publication of this fork is pending confirmation from the upstream authors.
+- **Licence:** CC0 1.0, per the Ergo Platform project. The upstream repository does not carry a licence file.
+
+---
+
+## Upstream README
+
+Everything below is the README of the Ergo explorer backend, kept as upstream wrote it. It describes the upstream project, not this fork.
+
+# Ergo Blockchain Explorer
 
 This repository contains 4 services:
 
