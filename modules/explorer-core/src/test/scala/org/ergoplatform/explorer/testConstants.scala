@@ -12,23 +12,23 @@ object testConstants {
     )
     .get
 
-  // YOLO devnet (node GET /emission/scripts and /utxo/genesis, 16 Nov 2026), network prefix 16
+  // YOLO devnet (node GET /emission/scripts and /utxo/genesis, 19 Nov 2026, 93 / 4 / 3 build), network prefix 16
 
   val DevnetEmissionNftId: TokenId =
     TokenId.fromStringUnsafe("44bc63258d371f08ba0ac4b87eb356cf8e84dbfa31afef89a5b4a953cabdad2a")
 
   val DevnetEmissionAddress: Address = Address.fromStringUnsafe(
     "cjJBXpeBnyebqDp7E8Tpc2ByoLgM4WrhvnveqHvikRVFstQEquepiUZjCkDRkZhHpkx7jQ7ME94npqmmgKtvhqwwdgswBpnr" +
-    "r4FPSBQXQqRQCXQUduNhd2YYQ2na9S9A4k7g49MBiRxMSz8U24UX5NdYvq6XJjuR26bzTb32Be5fDkz49cNQgS5vNmdPHZxX" +
-    "px1sU7Kukzzv9jnM9Qyoxx2cT3C9K3joM38kZMnmaPuZQ7rVTZGSUW8hqBrmkoztH6PtDUjWd4hRkSPYtyM1Zz8j6rtzdsG6" +
-    "iWid6kEivXHjG6rssNHwHKNEBQKCrKNHptwqYjP7o62wtdHETkYspBMeCoW5X4pJxFHBHTbmTkLrDE6WbKATL5qKhZENpLay" +
-    "Lt5ZDMvT8QKPR91LBRVBfvD7KTddPQUtxNbkD4ndWts9k7Vpo8zjSspqbxSZax5z2z7nsezHDT6mvo6ng1NUC7yue5MggfkA" +
-    "nUDJ5FBsrqigJdhQzEp8h8kw1Ecn9Xw2MkEjwhL9hoEouk39hC4MtPPJQsyP2KgfVZseQJAu6sE8LXgA6qbmbjXu4bF3MSdt" +
-    "om1CB6qJ73uKgESJyjQSxUvTFyAJT5vM9VVU415n8av3wTcKV56sa4yzSh1Vtd9JyBAo9pXpbnrxEDB51ZFQ4h6qPNHdqax4" +
-    "GiHA7Jy18iqGeWoJNKcwVdsDtYGoY1hou7Cktn2uZFvLbpMSzZow8zLjEUKuDRVG9Lc6HWTt13why2Rw1wRPDCps5ZME1TU5" +
-    "ZCp4kTnUUZJHFobaMU1jt76jW3pSSbd4F5c4zD45PzKK1p4mXvCKGTpfHmruCkvWJ56xjhk7q2QavvncdxfSRrj6LRxTV11Z" +
-    "NNLPZRs3HRhW22PKK2sHtM7S3poG7NdfuCcj5kAExx6sfrnC33xVzum5S3rCUdURfCWLegXxCzudhNt4S78A4PmC7jtjXhdt" +
-    "MdSjT"
+    "r4FPSBQXQqRQCXQUduNhd2YYQ2na9S9A4k7g49MBiRxMSz8U24UX5NdYvq6XJjqGTY22cRPGkurUqwnh5CzF4x8rUfB6C1ob" +
+    "DWapvbt1TJHcNozSSCdzRBMAg3qoLrj5jcWtsY3EuVKSpSJdkpSubKQqMFYJUywSyjbWWhCcxqkqLejKP5XJzSFqN5m9YJsf" +
+    "JVaAgPqVhZuSfHgPpb1mQWh5hxDTo68D3vqrzr2oQNviCJyX5jY7swUYWqs5WBCfyCdmz3pqvFCdqU9wwfH7TzMzGhy3doSM" +
+    "NZ8jg7WHjTLDXbLvDBCy5i2wVTBCCq4j2tddfbkpAizwnCtY1rpjkefxwUT5vwxG4xbD3SJk3EdvSBMvxDFAh15akiwkdUho" +
+    "SoQb8AsvpzepbSa9GFmJVEvxLDG3XU4RH7LzSSZMAXwvxRCt7GtCJ4bbfwbx8x14HxWmqPt415FRNScDACCtBhLNB7F9v2dN" +
+    "g9gnT2fAanTfwVFZTNbKxm1cCTLyChjECy5w1Zj2BE7VhSJHqzaPYQ3yS5ZZGSSwa4ggVvRvJjyKZgZEPYAPgPpEkA9xo81z" +
+    "kDJJTgd4G9ou12ydL8jYxoJBBB1rLerzZA6fe1z3P9WbZ9oxBkWe8X6q5LDTMPXWRTU4br969NDNfCBV4jqvQ9nnCJ3D4MGm" +
+    "3CwT2qi5ToAUy4VEvc2wBbVmtPeSVYDvQnd2DB3rrmmNpLhzUwh4fhupQfSRpBka1for2ikbM32QYNHexx4XZrENh37simRG" +
+    "dmaCV3Tz5g2tSZLEsHwopzgrCJPLBVd9xqpgEvLoWwgtHD75Sob4GoM6UqLgzCg7YUQ7SArc3rn7SJAzcV4cfnFQhw53V6Rn" +
+    "cNy8p"
   )
 
   val DevnetTreasuryAccumulationAddress: Address = Address.fromStringUnsafe(

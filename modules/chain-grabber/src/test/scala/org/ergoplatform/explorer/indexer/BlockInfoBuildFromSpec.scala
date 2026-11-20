@@ -19,7 +19,7 @@ class BlockInfoBuildFromSpec extends AnyFlatSpec with should.Matchers {
   "BlockInfoBuildFrom" should "count nothing but the emission spend at height 1" in {
     val stats = build(1, List(emissionTx(1, 177291175000000000L)))
     stats.minerAddress.unwrapped shouldBe MinerAddress
-    stats.minerReward shouldBe 63750000000L
+    stats.minerReward shouldBe 69750000000L
     stats.blockFee shouldBe 0L
     stats.blockCoins shouldBe 0L
     stats.totalCoinsIssued shouldBe 75000000000L
@@ -29,8 +29,8 @@ class BlockInfoBuildFromSpec extends AnyFlatSpec with should.Matchers {
     val lookalike = tx("aa", out(EmissionTree, 5000000000L))
     val user      = tx("bb", out(UserTree, 10000000000L), out(FeeTree, 1000000L))
     val stats     = build(24256, List(lookalike, emissionTx(24256, 175472050000000000L), user))
-    stats.minerReward shouldBe 63750000000L
-    stats.minerRevenue shouldBe 63751000000L
+    stats.minerReward shouldBe 69750000000L
+    stats.minerRevenue shouldBe 69751000000L
     stats.blockFee shouldBe 1000000L
     stats.blockCoins shouldBe 15000000000L
     stats.totalCoinsIssued shouldBe 1819200000000000L
@@ -42,13 +42,13 @@ class BlockInfoBuildFromSpec extends AnyFlatSpec with should.Matchers {
     val spoof = tx("dd", out(TreasuryTree, 1000000000L), out(LpTree, 1000000000L))
     val terminal = tx(
       "ee",
-      out(TreasuryTree, 100000000L),
-      out(LpTree, 50000000L),
-      out(MinerTree, 850000000L)
+      out(TreasuryTree, 40000000L),
+      out(LpTree, 30000000L),
+      out(MinerTree, 930000000L)
     )
     val stats = build(h, List(user, spoof, terminal))
     settings.emission.terminalHeight shouldBe h.toLong
-    stats.minerReward shouldBe 850000000L
+    stats.minerReward shouldBe 930000000L
     stats.blockFee shouldBe 2000000L
     stats.blockCoins shouldBe 4000000000L
     stats.totalCoinsIssued shouldBe settings.yolo.genesisValue
@@ -64,9 +64,9 @@ class BlockInfoBuildFromSpec extends AnyFlatSpec with should.Matchers {
 
   it should "count no coins in a block whose only other transaction pays a fee" in {
     val stats = build(24256, List(emissionTx(24256, 175472050000000000L), tx("ab", out(FeeTree, 4000000L))))
-    stats.minerReward shouldBe 63750000000L
+    stats.minerReward shouldBe 69750000000L
     stats.blockFee shouldBe 4000000L
-    stats.minerRevenue shouldBe 63754000000L
+    stats.minerRevenue shouldBe 69754000000L
     stats.blockCoins shouldBe 0L
   }
 }

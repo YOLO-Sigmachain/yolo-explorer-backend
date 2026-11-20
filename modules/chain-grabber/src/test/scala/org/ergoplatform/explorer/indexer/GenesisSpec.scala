@@ -24,7 +24,7 @@ class GenesisSpec extends AnyFlatSpec with should.Matchers {
     implicit val c: WithContext[IO, ProtocolSettings] = ctx(settings)
     val rows                                          = genesis.rows[IO](boxes).unsafeRunSync()
     rows.outputs.map(_.boxId.value) shouldBe List(
-      "fc7b9e4425d3f30992d79a1cb4c5a720a792719c5621c025f75cac23fc9d8fa1",
+      "2b765128c1914b268778fab5e072c071c4fd8c5335ee3ecb30e91cad09a6d91b",
       "fa97b89ca4113e0f9f5d84ca583bf9543ece6c75d2e6f49635fff073404542bd",
       "fee96215874226af958ef335028bb46f7e3c226653f99ddb22c55dab804e83f4",
       "3bfaf76c824df668822dfce71abaf688d0281f91c3ac2a271f92fa28c3efaac7"
@@ -118,14 +118,14 @@ object GenesisSpec {
   lazy val boxes: List[ApiGenesisBox] =
     io.circe.parser.decode[List[ApiGenesisBox]](sample.stripMargin.replace("\n", "")).fold(throw _, identity)
 
-  // GET /utxo/genesis on the YOLO devnet node, 16 Nov 2026: the emission box, the treasury and LP fund boxes (each
+  // GET /utxo/genesis on the YOLO devnet node (93 / 4 / 3 build), 19 Nov 2026: the emission box, the treasury and LP fund boxes (each
   // holding its NFT) and the no-premine box
   val sample: String =
     """
-      |[{"boxId":"fc7b9e4425d3f30992d79a1cb4c5a720a792719c5621c025f75cac23fc9d8fa1","value":177291250000000000,"ergoT
+      |[{"boxId":"2b765128c1914b268778fab5e072c071c4fd8c5335ee3ecb30e91cad09a6d91b","value":177291250000000000,"ergoT
       |ree":"10290e2044bc63258d371f08ba0ac4b87eb356cf8e84dbfa31afef89a5b4a953cabdad2a04020480a9800104000580b8c9e5ae04
       |04020580dce4b2970204040580aeb2d98b010406058097d9ec45040805c0cbacf622040a05e0a596bb110580bcc1960b0580bcc1960b05
-      |80bcc1960b0400051405c80104000402050a05c801051405c8010404050a05c801040005020e07100204802d08cd0e0eea02d192a39a8c
+      |80bcc1960b0400050805c80104000402050605c801050805c8010404050605c801040005020e07100204802d08cd0e0eea02d192a39a8c
       |c7a701730073010400040204000400050204080406d815d6017300d602b1a5d603b2a5997202730100d604c1a7d6059da37302d6069590
       |72057303730495937205730573069593720573077308959372057309730a95937205730b730c95937205730d730e730fd6079591720673
       |1072067311d608b2a5731200d609c17208d60a9d9c720473137314d60bc27208d60ce4c6a7040ed60dd9010d63eded93b1db6308720d73
