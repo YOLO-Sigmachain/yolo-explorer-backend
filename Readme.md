@@ -1,5 +1,18 @@
 # Ergo Blockchain Explorer
 
+## About this fork
+
+This is the YOLO SigmaChain fork of [explorer-backend](https://github.com/ergoplatform/explorer-backend).
+
+- **Starts from:** upstream commit `f811ccd55a0a3f2f38069ce8a91b09c77321c1e3`, 8 commits after tag `10.0.0`.
+- **What changes:**
+  - Its own emission schedule for the YOLO chain, with each emission spend split 93 / 4 / 3 between miner, treasury and liquidity fund (`protocol.yolo` settings: `treasury-percent = 4`, `lp-percent = 3`).
+  - Reads the YOLO genesis boxes and NFTs, and takes chain settings such as the voting epoch length (128) from configuration.
+  - Reference settings files and tests for these rules.
+- **Fixed to the test genesis:** the lowest box index (four genesis boxes) and the API text "201 YOLO in genesis boxes" follow the test genesis. Both change if the launch genesis differs.
+- **Compare with upstream:** Every change is in the commits after the starting commit above. GitHub's compare view against the upstream project shows them.
+- **Licence:** the upstream project does not state one. Publication of this fork is pending confirmation from the upstream authors.
+
 This repository contains 4 services:
 
 ### 1. Chain Grabber
